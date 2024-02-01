@@ -37,12 +37,13 @@ function AuthShowcase() {
   );
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      {/* <button
+      {sessionData ? "" : 
+      <button
         className="rounded-full bg-orange-400 px-10 py-3  font-semibold text-black no-underline transition hover:shadow-lg"
         onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button> */}
+        >
+          Sign in
+        </button>}
     </div>
   );
 }
