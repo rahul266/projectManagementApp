@@ -10,7 +10,6 @@ import { createProject } from "~/server/api/routers/projects"
 const ProjectPage = () => {
     const sessionData = useSession();
     const userId=sessionData.data?.user.id
-    console.log('sessionData: ',sessionData);
     const [list, setList] = useState<createProject[]>([])
     const mutation = api.post.createProject.useMutation()
     const { data: mutationResponse } = mutation
@@ -50,7 +49,6 @@ const ProjectPage = () => {
             user: createdBy,
         };
         const data = mutation.mutate(CreateTableData )
-        console.log(data, "Data in process")
     }
     if (isLoading) {
         return (<div className="flex-row min-h-screen">

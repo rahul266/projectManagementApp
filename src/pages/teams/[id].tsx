@@ -131,7 +131,6 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
     const promises = projectIds.map(async (projectId:string) => {
         try {
             const result = await getUsersofAProject(db, { projectId: projectId });
-            console.log(result)
             return result; 
         } catch (error) {
             console.error(`Error processing projectId ${projectId}:`, error);

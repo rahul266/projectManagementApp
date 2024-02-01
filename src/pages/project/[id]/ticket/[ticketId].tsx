@@ -35,7 +35,6 @@ const projectTicketListingPage = (props: getProps) => {
     const ticket = props.data.ticketDetails.data
     const membersOfUsers = props.data.membersOfUsers
     if (!ticket) {
-        console.log(props)
       return (<></>)  
     }
     const [successMessage, setSuccessMessage] = useState('');

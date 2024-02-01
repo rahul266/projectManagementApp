@@ -5,6 +5,7 @@ import { getProjectsOfUser, getProjectsOfUserSchemaInput } from "~/server/api/ro
 import { useEffect, useState } from "react"
 import { ProjectUserMapping, User } from "@prisma/client"
 import { TicketStatuses } from "~/utils/constant"
+import { useRouter } from "next/router"
 interface getProps {
     data: createProject[]
 }
@@ -18,7 +19,7 @@ export interface createProject {
 }
 const ticketCreationPage = (props:getProps) => {
     const data = props.data
-    console.log(data)
+    const router = useRouter();
     if (data.length==0) {
         return(<>No projects</>)
     }
@@ -27,8 +28,9 @@ const ticketCreationPage = (props:getProps) => {
     const [showPopup, setShowPopup] = useState(false);
     const mutation = api.post.getUsersOfProject.useMutation()
     const createTicketMutation = api.ticket.createTicket.useMutation({
-        onSuccess: () => {
+        onSuccess: (data) => {
             setSuccessMessage('Ticket details updated successfully!');
+            router.push(`/project/${data.projectId}`)
         },
         onError: (data) => {
             setErrorMessage('Failed to update ticket details: ' + data.message);
@@ -44,6 +46,40 @@ const ticketCreationPage = (props:getProps) => {
     const [priority, setPriority] = useState(1); 
     const [userData,setUsersData] =useState<User[]>([])
     const handleCreateTicket = () => {
+        if (!projectId || projectId === '') {
+            setErrorMessage('Please select a valid project.');
+            return;
+        }
+
+        if (!ticketType || ticketType === 0) {
+            setErrorMessage('Please select a valid ticket type.');
+            return;
+        }
+
+        if (!assignTo || assignTo === 'select') {
+            setErrorMessage('Please select a valid assignee.');
+            return;
+        }
+
+        if (!ticketStatus || ticketStatus === 0) {
+            setErrorMessage('Please select a valid ticket status.');
+            return;
+        }
+
+        if (!name.trim()) {
+            setErrorMessage('Please enter a valid summary.');
+            return;
+        }
+
+        if (!description.trim()) {
+            setErrorMessage('Please enter a valid description.');
+            return;
+        }
+
+        if (!priority || priority === 0) {
+            setErrorMessage('Please select a valid priority.');
+            return;
+        }
         const formData = {
             projectId: projectId,
             ticketStatus: ticketStatus,
@@ -57,12 +93,10 @@ const ticketCreationPage = (props:getProps) => {
     }
     useEffect(() => {
         if (mutationResponse) {
-            console.log(mutationResponse)
             setUsersData((prevList) => [...prevList, ...mutationResponse])
         }
     }, [mutationResponse])
     useEffect(() => {
-        console.log(createTicketMutation, "sucessFully created")
     }, [createTicketMutation])
     useEffect(() => {
         if (successMessage || errorMessage) {
