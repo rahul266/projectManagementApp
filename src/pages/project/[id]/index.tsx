@@ -43,7 +43,6 @@ const projectTicketListingPage = (props: getProps) => {
     if (props.data.ticketDetails.length === 0) {
         return (<>No data to publish</>)
     }
-    console.log(props.data)
     const list = props.data.ticketDetails
     const projectDetails = props.data.projectDetails
     const formatedDate = projectDetails.deadLine.slice(0, 10)

@@ -101,13 +101,11 @@ export const postRouter = createTRPCRouter({
           projectId:input.projectId
         }
       })
-      console.log(data,input.projectId)
       const userData = await ctx.db.user.findMany({
         where: {
           id: { in:data.map((element) => element.userId) }
         }
       })
-      console.log(userData,'users')
       return userData
   }),
 
