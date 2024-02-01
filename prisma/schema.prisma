@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+model Project {
+  id              String  @id @default(cuid())
+  ProjectName     String
+  deadLine        DateTime @default(dbgenerated("NOW() + INTERVAL '1 month'"))
+  CreatedBy       String
+  user            User    @relation(fields: [CreatedBy], references: [id])
+  tickets         Ticket[]
+  projectUserMappings ProjectUserMapping[]
+}
+
+
+// Workflow model
+model Workflow {
+  id      Int     @id @default(autoincrement())
+  status  String
+  tickets Ticket[]
+}
+
+// Ticket model
+model Ticket {
+  id              Int      @id @default(autoincrement())
+  ticketStatus    Int
+  ticketType      Int
+  projectId       String
+  name            String
+  description     String
+  assignedTo      String
+  priority        Int
+  labels          String[]
+  workflow        Workflow @relation(fields: [ticketStatus], references: [id])
+  project         Project  @relation(fields: [projectId], references: [id])
+  priorityState   Priority @relation(fields:[priority],references:[id])
+  user            User     @relation(fields:[assignedTo],references:[id])
+}
+
+
+model ProjectUserMapping {
+    id            Int       @id @default(autoincrement())
+    projectId     String    
+    userId        String
+    project       Project @relation(fields: [projectId], references: [id])
+    user          User    @relation(fields: [userId], references: [id])
+}
+
+model Priority {
+    id      Int     @id @default(autoincrement())
+    state   String
+    tickets Ticket[]
+}
+
+// Necessary for Next auth
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? // @db.Text
+    access_token      String? // @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? // @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    projects      Project[]
+    ProjectUserMappings ProjectUserMapping[]
+    tickets       Ticket[]
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
